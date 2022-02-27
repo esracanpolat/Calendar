@@ -11,7 +11,7 @@ export default function Calendar() {
     const [title, setTitle] = useState('');
     const [text, setText] = useState('');
     const [openModal, setOpenModal] = useState(false);
-    const [detail, setDetail] = useState([])
+    const [detail, setDetail] = useState(null)
 
     const dispatch = useDispatch();
     const Plans = useSelector((state: any) => state.calendarReducer).Plan;
@@ -43,13 +43,21 @@ export default function Calendar() {
         setTitle('');
     }
     function OpenDetailModal(data: any) {
-        setDetail(data);
+        setDetail(data.id);
+        console.log(detail, "detail", Plans.find((content: any) => content.id == detail).time, Plans.find((content: any) => content.id == detail).text);
+        if (detail) {
+            setTime(Plans.find((content: any) => content.id == detail).time);
+            setTitle(Plans.find((content: any) => content.id == detail).title);
+            setText(Plans.find((content: any) => content.id == detail).text);
+        }
+
         setOpenModal(true);
     }
-    console.log(detail, "detail");
+    console.log(detail, "detail", time, text);
 
-    function editPlan(ID: any) {
-        dispatch(editPlan(ID))
+    function editPlanFunc(ID: any) {
+
+        dispatch(editPlan({ id: ID, body: text, title: title, time: time, type: select }));
     }
     function searchPlanFunc(e: React.ChangeEvent<HTMLInputElement>) {
         const newData = {
@@ -58,6 +66,7 @@ export default function Calendar() {
         }
         dispatch(searchPlan(newData));
     }
+
     return (
         <div style={{ margin: 30 }}>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -72,9 +81,6 @@ export default function Calendar() {
                         <input type="checkbox" className="btn-check" id="btncheck3" autoComplete="off" />
                         <label className="btn btn-outline-primary" htmlFor={"btncheck3"} onClick={() => setSelect('D')} >Günlük</label>
                     </div>
-                </div>
-                <div>
-                    <button> Kaydet</button>
                 </div>
             </div>
             <hr />
@@ -112,8 +118,8 @@ export default function Calendar() {
                                     <label className="form-label">Açıklama:</label>
                                     <input className="form-control" type="textarea" defaultValue={text} height={300} width={500} onBlur={textInput} />
                                 </div>
-                                <div className='d-flex justşfy-content-end mt-4'>
-                                    <button className='primary' onClick={() => Save()}>Planla</button>
+                                <div className='d-flex justify-content-end mt-4'>
+                                    <button className='btn btn-primary' onClick={() => Save()}>Planla</button>
                                 </div>
                             </div>
 
@@ -124,22 +130,33 @@ export default function Calendar() {
                 <div className='col'>
                     {/* <input type="text" width="100%" onChange={(e) => searchPlanFunc(e)} /> */}
                     <div>
-                        {select == 'M' && Plans && Plans.filter((plan: any) => plan.type == 'M') && Plans.filter((plan: any) => plan.type == 'M').map((data: any) =>
-                        (<ul className="list-group">
+                        <ul className="list-group">
                             <li className="list-group-item">
                                 <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                    <div>Konu</div>
+                                    <div>içerik</div>
+                                    <div>Zaman</div>
+                                    <div></div>
+                                </div>
+                            </li>
+                            {select == 'M' && Plans && Plans.filter((plan: any) => plan.type == 'M') && Plans.filter((plan: any) => plan.type == 'M').map((data: any) =>
+                            (<li className="list-group-item">
+                                <div style={{ display: "flex", justifyContent: "space-between" }}>
                                     <div>{data.title}</div>
+                                    <div>{data.body}</div>
+                                    <div>{data.time}</div>
                                     <div><button className="mr-4" onClick={() => setOpenModal(true)}>detay</button>
                                         <button className="danger" onClick={() => dispatch(deletePlan(data.id))}>Sil</button></div>
                                 </div>
-                            </li>
-                        </ul>)
-                        )}
+                            </li>))}
+                        </ul>
                         {select == 'W' && Plans && Plans.filter((plan: any) => plan.type == 'W') && Plans.filter((plan: any) => plan.type == 'W').map((data: any) =>
                         (<ul className="list-group">
                             <li className="list-group-item">
                                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                                     <div>{data.title}</div>
+                                    <div>{data.body}</div>
+                                    <div>{data.time}</div>
                                     <div>
                                         <button className="mr-4" onClick={() => setOpenModal(true)}>detay</button>
                                         <button className="danger" onClick={() => dispatch(deletePlan(data.id))}>Sil</button></div>
@@ -151,9 +168,11 @@ export default function Calendar() {
                         (<ul className="list-group">
                             <li className="list-group-item">
                                 <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                    <div>{data.title}jdıejıdjeıfjrıo</div>
-                                    <div><button className="mr-4" onClick={() => OpenDetailModal(data)}>detay</button>
-                                        <button className="danger" onClick={() => dispatch(deletePlan(data.id))}>Sil</button></div>
+                                    <div>{data.title}</div>
+                                    <div>{data.body}</div>
+                                    <div>{data.time}</div>
+                                    <div><button className="btn btn-succes" style={{ marginRight: 10 }} onClick={() => OpenDetailModal(data)}>detay</button>
+                                        <button className="btn btn-danger" onClick={() => dispatch(deletePlan(data.id))}>Sil</button></div>
                                 </div>
                             </li>
                         </ul>)
@@ -163,10 +182,27 @@ export default function Calendar() {
             </div>
             <Modal
                 open={openModal} onClose={() => setOpenModal(false)} center>
-                <div style={{ minWidth: 300, minHeight: 400 }}>
-                    <div><label>başlık:</label><label contentEditable="true">{detail && detail}</label></div>
-                    <div><label>Açıklama:</label><label contentEditable="true">{detail && detail}</label></div>
-                    <div style={{ display: "flex", justifyContent: "end" }}><button onClick={(e) => editPlan(e)}> Düzenle</button></div>
+                <div style={{ minWidth: 300, minHeight: 400, padding: 35 }}>
+                    <div><label>Tarih:</label>
+                        {select == 'M' && <input
+                            className="form-control"
+                            type="month"
+                            value={month}
+                            onChange={inputMonth} />}
+                        {select == 'W' &&
+                            <input type="week"
+                                className="form-control"
+                                value={week}
+                                onChange={inputWeek} />}
+                        {select == 'D' && <input
+                            type="date"
+                            className="form-control"
+                            value={time}
+                            onChange={inputHandler} />}
+                    </div>
+                    <div><label>başlık:</label><input className="form-control" value={title} onBlur={titleInput}></input></div>
+                    <div><label>Açıklama:</label><input className="form-control" value={text} onBlur={textInput} /></div>
+                    <div style={{ display: "flex", justifyContent: "end", marginTop: 20 }}><button onClick={(e) => editPlanFunc(detail ? Plans.find((content: any) => content.id == detail).id : null)}> Düzenle</button></div>
                 </div>
             </Modal>
         </div>

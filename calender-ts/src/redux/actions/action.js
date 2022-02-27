@@ -13,10 +13,10 @@ export const searchPlan = (searchData) => {
         payload: searchData,
     }
 }
-export const editPlan = (id) => {
+export const editPlan = (data) => {
     return {
         type: "EDIT_PLAN",
-        payload: id,
+        payload: data,
     }
 }
 

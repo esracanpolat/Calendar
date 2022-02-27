@@ -18,12 +18,12 @@ export const calendarReducer = (state = initialState, action) => {
                 Plan: searchData
             }
         case "EDIT_PLAN":
-            const editData = state.Plan.find(todo => todo.id !== action.payload.id);
-            console.log(editData, "editData");
-            state.map((post) => post.id === action.id ? { ...post, editing: !post.editing } : post)
+            const indexU = state.Plan.find(todo => todo.id !== action.payload.id);
+            console.log(indexU, "index u");
+            debugger;
             return {
                 ...state,
-                Plan: [...state.posts.filter(p => p !== editData), { ...editData }]
+                Plan: [action.payload, ...state[indexU].Plan]
             }
         case "ADD_PLAN":
             return {
