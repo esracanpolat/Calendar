@@ -14,6 +14,7 @@ export const searchPlan = (searchData) => {
     }
 }
 export const editPlan = (data) => {
+    console.log(data, "data");
     return {
         type: "EDIT_PLAN",
         payload: data,

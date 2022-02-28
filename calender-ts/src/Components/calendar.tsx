@@ -30,9 +30,10 @@ export default function Calendar() {
         setText(event.target.value);
     };
     const titleInput = (event: React.FocusEvent<HTMLInputElement>) => {
+        console.log(event.target.value, "lmfkermfkr");
+
         setTitle(event.target.value);
     };
-    console.log(Math.floor(Math.random() * 100), "=>id", Plans.filter((plan: any) => plan.type !== 'W'), Plans.filter((plan: any) => plan.type !== 'D'));
 
     function Save() {
         const uuid = Math.floor(Math.random() * 100);
@@ -44,11 +45,11 @@ export default function Calendar() {
     }
     function OpenDetailModal(data: any) {
         setDetail(data.id);
-        console.log(detail, "detail", Plans.find((content: any) => content.id == detail).time, Plans.find((content: any) => content.id == detail).text);
+
         if (detail) {
             setTime(Plans.find((content: any) => content.id == detail).time);
             setTitle(Plans.find((content: any) => content.id == detail).title);
-            setText(Plans.find((content: any) => content.id == detail).text);
+            setText(Plans.find((content: any) => content.id == detail).body);
         }
 
         setOpenModal(true);
@@ -65,6 +66,14 @@ export default function Calendar() {
             type: select
         }
         dispatch(searchPlan(newData));
+    }
+    function handleClose() {
+        setTime('');
+        setText('');
+        setMonth('');
+        setTitle('');
+        setOpenModal(false);
+
     }
 
     return (
@@ -132,11 +141,11 @@ export default function Calendar() {
                     <div>
                         <ul className="list-group">
                             <li className="list-group-item">
-                                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                    <div>Konu</div>
-                                    <div>içerik</div>
-                                    <div>Zaman</div>
-                                    <div></div>
+                                <div className="row" style={{ display: "flex", justifyContent: "space-between" }}>
+                                    <div className='col-3'>Konu</div>
+                                    <div className='col-3'>içerik</div>
+                                    <div className='col-3'>Zaman</div>
+                                    <div className='col-3'></div>
                                 </div>
                             </li>
                             {select == 'M' && Plans && Plans.filter((plan: any) => plan.type == 'M') && Plans.filter((plan: any) => plan.type == 'M').map((data: any) =>
@@ -167,11 +176,12 @@ export default function Calendar() {
                         {select == 'D' && Plans && Plans.filter((plan: any) => plan.type == 'D') && Plans.filter((plan: any) => plan.type == 'D').map((data: any) =>
                         (<ul className="list-group">
                             <li className="list-group-item">
-                                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                    <div>{data.title}</div>
-                                    <div>{data.body}</div>
-                                    <div>{data.time}</div>
-                                    <div><button className="btn btn-succes" style={{ marginRight: 10 }} onClick={() => OpenDetailModal(data)}>detay</button>
+                                <div className='row'>
+                                    <div className='col-3'>{data.title}</div>
+                                    <div className='col-3'>{data.body}</div>
+                                    <div className='col-3'>{data.time}</div>
+                                    <div className='col-3'>
+                                        <button className="btn btn-succes" style={{ marginRight: 10 }} onClick={() => OpenDetailModal(data)}>detay</button>
                                         <button className="btn btn-danger" onClick={() => dispatch(deletePlan(data.id))}>Sil</button></div>
                                 </div>
                             </li>
@@ -181,7 +191,7 @@ export default function Calendar() {
                 </div>
             </div>
             <Modal
-                open={openModal} onClose={() => setOpenModal(false)} center>
+                open={openModal} onClose={handleClose} center>
                 <div style={{ minWidth: 300, minHeight: 400, padding: 35 }}>
                     <div><label>Tarih:</label>
                         {select == 'M' && <input
@@ -200,8 +210,8 @@ export default function Calendar() {
                             value={time}
                             onChange={inputHandler} />}
                     </div>
-                    <div><label>başlık:</label><input className="form-control" value={title} onBlur={titleInput}></input></div>
-                    <div><label>Açıklama:</label><input className="form-control" value={text} onBlur={textInput} /></div>
+                    <div><label>başlık:</label><input className="form-control" defaultValue={title} onBlur={titleInput} readOnly={false}></input></div>
+                    <div><label>Açıklama:</label><input className="form-control" defaultValue={text} onBlur={textInput} /></div>
                     <div style={{ display: "flex", justifyContent: "end", marginTop: 20 }}><button onClick={(e) => editPlanFunc(detail ? Plans.find((content: any) => content.id == detail).id : null)}> Düzenle</button></div>
                 </div>
             </Modal>
