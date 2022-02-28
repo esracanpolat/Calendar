@@ -18,7 +18,7 @@ export const calendarReducer = (state = initialState, action) => {
                 Plan: searchData
             }
         case "EDIT_PLAN":
-            let index = 0;
+            let index = state.Plan.findIndex(todo => todo.id === action.payload.id);
             return {
                 ...state,
                 Plan: [

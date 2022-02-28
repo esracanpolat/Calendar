@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { deletePlan, searchPlan, setNewPlan, editPlan } from '../redux/actions/action';
 import Modal from "react-responsive-modal";
@@ -11,7 +11,8 @@ export default function Calendar() {
     const [title, setTitle] = useState('');
     const [text, setText] = useState('');
     const [openModal, setOpenModal] = useState(false);
-    const [detail, setDetail] = useState(null)
+    const [detail, setDetail] = useState(null);
+    const [notification, setNotification] = useState(false);
 
     const dispatch = useDispatch();
     const Plans = useSelector((state: any) => state.calendarReducer).Plan;
@@ -30,8 +31,6 @@ export default function Calendar() {
         setText(event.target.value);
     };
     const titleInput = (event: React.FocusEvent<HTMLInputElement>) => {
-        console.log(event.target.value, "lmfkermfkr");
-
         setTitle(event.target.value);
     };
 
@@ -54,7 +53,7 @@ export default function Calendar() {
 
         setOpenModal(true);
     }
-    console.log(detail, "detail", time, text);
+
 
     function editPlanFunc(ID: any) {
 
@@ -75,6 +74,12 @@ export default function Calendar() {
         setOpenModal(false);
 
     }
+    useEffect(() => {
+        if (Plans.filter((content: any) => content.time == Date.now())) {
+            setNotification(true);
+        }
+    }, [Date.now()]);
+    console.log(notification, Date.now(), "notification", Plans.filter((content: any) => content.time == Date.now()));
 
     return (
         <div style={{ margin: 30 }}>
